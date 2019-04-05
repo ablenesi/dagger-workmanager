@@ -8,20 +8,29 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Provider
-
-class Foo @Inject constructor()
 
 class HelloWorldWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted private val params: WorkerParameters,
-    private val foo: Foo
+    private val weatherService: WeatherService
 ) : Worker(appContext, params) {
     private val TAG = "HelloWorldWorker"
     override fun doWork(): Result {
         Log.d(TAG, "Hello world!")
-        Log.d(TAG, "Injected foo: $foo")
+        Log.d(TAG, "Injected foo: $weatherService")
+
+        var result: Response<String>? = null
+        try {
+            result = weatherService.weather().execute()
+        } catch (t: Throwable) {
+            Log.d(TAG, "FAILED: ${t.message}")
+        }
+
+        Log.d(TAG, "RESULT: ${result?.body()}")
+
         return Result.success()
     }
 

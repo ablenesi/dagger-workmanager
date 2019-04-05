@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Dagger Workmanager Sample</string>
+    <string name="change_server">Change Server</string>
+    <string name="save">Save</string>
+    <string name="other_weather_api">Other Weather API</string>
+    <string name="weather_api">Weather API</string>
 </resources>
