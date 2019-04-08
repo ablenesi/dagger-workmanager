@@ -1,7 +1,8 @@
 package com.sample.daggerworkmanagersample
 
 import android.app.Activity
-import dagger.android.AndroidInjection.inject
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
@@ -27,15 +28,20 @@ interface Injection : HasActivityInjector {
     class DaggerInjection : Injection {
         @Inject
         lateinit var activityInjector: DispatchingAndroidInjector<Activity>
+        @Inject
+        lateinit var factory: SampleWorkerFactory
 
         private var application: SampleApplication? = null
 
         override fun initComponent(application: SampleApplication, baseUrl: String) {
             this.application = application
-            DaggerSampleComponent.builder().baseUrl(baseUrl).build().run {
-                inject(this@DaggerInjection)
-                inject(application)
-            }
+            DaggerSampleComponent.builder()
+                .baseUrl(baseUrl).apply { seedInstance(application) }
+                .build().also {
+                    it.inject(this)
+                    it.inject(application)
+                }
+            WorkManager.initialize(application, Configuration.Builder().setWorkerFactory(factory).build())
         }
 
         override fun reinitCompnent(baseUrl: String) {

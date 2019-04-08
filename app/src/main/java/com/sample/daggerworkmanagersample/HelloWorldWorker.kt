@@ -15,21 +15,16 @@ import javax.inject.Provider
 class HelloWorldWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted private val params: WorkerParameters,
-    private val weatherService: WeatherService
+    private val weatherService: WeatherService,
+    @BaseUrl private val baseUrl: String
 ) : Worker(appContext, params) {
     private val TAG = "HelloWorldWorker"
     override fun doWork(): Result {
         Log.d(TAG, "Hello world!")
-        Log.d(TAG, "Injected foo: $weatherService")
+        Log.d(TAG, "Injected service: $weatherService")
+        Log.d(TAG, "Injected Base url: $baseUrl")
 
-        var result: Response<String>? = null
-        try {
-            result = weatherService.weather().execute()
-        } catch (t: Throwable) {
-            Log.d(TAG, "FAILED: ${t.message}")
-        }
-
-        Log.d(TAG, "RESULT: ${result?.body()}")
+        // TODO: Execute request
 
         return Result.success()
     }

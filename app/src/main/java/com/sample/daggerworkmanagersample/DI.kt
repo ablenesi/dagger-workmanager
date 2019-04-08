@@ -8,10 +8,7 @@ import dagger.android.AndroidInjector
 import dagger.android.ContributesAndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.multibindings.IntoMap
-import retrofit2.Call
 import retrofit2.Retrofit
-import retrofit2.http.GET
-import retrofit2.http.Query
 import javax.inject.Qualifier
 import kotlin.reflect.KClass
 
@@ -20,7 +17,8 @@ import kotlin.reflect.KClass
         SampleAssistedInjectModule::class,
         WorkerBindingModule::class,
         NetworkModule::class,
-        ActivityBinderModule::class
+        ActivityBinderModule::class,
+        AppModule::class
     ]
 )
 interface SampleComponent : AndroidInjector<SampleApplication> {
@@ -29,10 +27,9 @@ interface SampleComponent : AndroidInjector<SampleApplication> {
     abstract class Builder : AndroidInjector.Builder<SampleApplication>() {
         @BindsInstance
         abstract fun baseUrl(@BaseUrl baseUrl: String): Builder
+        abstract fun appModule(appModule: AppModule): Builder
+        abstract override fun build(): SampleComponent
     }
-
-    @BaseUrl
-    fun baseUrl(): String
 
     fun factory(): SampleWorkerFactory
 
@@ -40,8 +37,12 @@ interface SampleComponent : AndroidInjector<SampleApplication> {
 
     fun activityInjector(): DispatchingAndroidInjector<Activity>
 
+    @BaseUrl
+    fun baseUrl(): String
+
 }
 
+// region Work Manager
 @Module(includes = [AssistedInject_SampleAssistedInjectModule::class])
 @AssistedModule
 interface SampleAssistedInjectModule
@@ -58,7 +59,9 @@ interface WorkerBindingModule {
     @WorkerKey(HelloWorldWorker::class)
     fun bindHelloWorldWorker(factory: HelloWorldWorker.Factory): ChildWorkerFactory
 }
+// endregion
 
+// region Networking
 @Module
 class NetworkModule {
     @Provides
@@ -74,26 +77,25 @@ class NetworkModule {
         retrofit.create(WeatherService::class.java)
 }
 
-
-interface WeatherService {
-    @GET("weather")
-    fun weather(@Query("q") query: String = "London"): Call<String>
-}
-
 @Qualifier
 annotation class BaseUrl
+// endregion
 
-const val OTHER_BASE_URL = "https://my-json-server.typicode.com/ablenesi/demo/"
-const val OPEN_WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/"
-
-const val OPEN_WEATHER_APP_ID = "b6907d289e10d714a6e88b30761fae22"
-
+// region Activity
 @Module
-abstract class ActivityBinderModule {
+interface ActivityBinderModule {
     @ContributesAndroidInjector
-    abstract fun bindChangeActivity(): ChangeActivity
-
-    @ContributesAndroidInjector
-    abstract fun bindMainActivity(): MainActivity
-
+    fun bindChangeActivity(): ChangeActivity
 }
+// endregion
+
+// region Context
+/**
+ * Module for application dependencies which require a {@link Context}
+ */
+@Module
+class AppModule{
+    @Provides
+    fun provideInjection(app: SampleApplication): Injection = app
+}
+// endregion

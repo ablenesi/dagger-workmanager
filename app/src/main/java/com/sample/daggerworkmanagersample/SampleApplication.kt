@@ -8,11 +8,8 @@ import javax.inject.Inject
 
 class SampleApplication : Application(), Injection by Injection.DaggerInjection() {
 
-    @Inject
-    lateinit var factory: SampleWorkerFactory
-
     override fun onCreate() {
         super.onCreate()
-        WorkManager.initialize(this, Configuration.Builder().setWorkerFactory(factory).build())
+        initComponent(this, OPEN_WEATHER_BASE_URL)
     }
 }
