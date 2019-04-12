@@ -1,4 +1,4 @@
-package com.sample.daggerworkmanagersample
+package com.sample.daggerworkmanagersample.network
 
 import retrofit2.Call
 import retrofit2.http.GET

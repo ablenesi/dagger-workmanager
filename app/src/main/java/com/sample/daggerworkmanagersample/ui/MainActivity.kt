@@ -1,10 +1,12 @@
-package com.sample.daggerworkmanagersample
+package com.sample.daggerworkmanagersample.ui
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.sample.daggerworkmanagersample.R
+import com.sample.daggerworkmanagersample.work.HelloWorldWorker
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
